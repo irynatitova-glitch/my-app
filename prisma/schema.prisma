@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Competitor {
+  id          String   @id @default(cuid())
+  name        String
+  appStoreUrl String?
+  category    String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  updates     Update[]
+
+  @@map("competitors")
+}
+
+model Update {
+  id           String     @id @default(cuid())
+  competitorId String
+  type         UpdateType
+  title        String
+  description  String?
+  sourceUrl    String?
+  imageUrl     String?
+  screenshots  String[]
+  occurredAt   DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+
+  competitor   Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  insight      Insight?
+
+  @@map("updates")
+}
+
+model Insight {
+  id                String   @id @default(cuid())
+  updateId          String   @unique
+  monetizationModel String?
+  keyHooks          String[]
+  targetPersona     String?
+  aveolaTips        String[]
+  rawInput          String?
+  createdAt         DateTime @default(now())
+
+  update            Update   @relation(fields: [updateId], references: [id], onDelete: Cascade)
+
+  @@map("insights")
+}
+
+enum UpdateType {
+  FEATURE
+  PRICING
+  APP_STORE
+  UA_CREATIVE
+}

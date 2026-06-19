@@ -1,0 +1,10 @@
+{
+  "orgId": "org-solitary-grass-86127095",
+  "projectId": "sparkling-fire-70468562",
+  "_init": {
+    "features": [
+      "database",
+      "auth"
+    ]
+  }
+}
